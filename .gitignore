@@ -1,0 +1,9 @@
+*.o
+*.dep
+*.a
+*.so
+*.so.1
+*.so.1.0.0
+cpu_info_test
+bat_info_test
+mem_info_test
