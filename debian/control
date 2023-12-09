@@ -1,0 +1,33 @@
+Source: libsysinfo
+Priority: extra
+Maintainer: Cyril Hrubis <metan@ucw.cz>
+Build-Depends: debhelper (>= 9.0)
+Standards-Version: 4.0.0
+Section: libs
+Homepage: http://gfxprim.ucw.cz/
+
+Package: libsysinfo-dev
+Section: libdevel
+Architecture: any
+Depends: libsysinfo1 (= ${binary:Version})
+Description: A system information and statistic parser library
+ Minimalistic library to parse system information and statistics.
+ .
+ This package contains the header and development files which are
+ needed for building applications.
+
+Package: libsysinfo1
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: A system information and statistic parser library
+ Minimalistic library to parse system information and statistics.
+ .
+ This package contains the shared libraries.
+
+Package: sysinfo-tests
+Section: misc
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libsysinfo1 (= ${binary:Version})
+Description: A system information and statistic parser library
+ Simple tools to test the sysinfo library.
