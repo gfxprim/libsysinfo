@@ -322,6 +322,7 @@ static void parse_model_name(struct cpu_arch *arch, struct cpuinfo_entry *entry)
 		model_name = remove_prefix(model_name, "Core(TM)");
 		model_name = remove_prefix(model_name, "2 Duo CPU");
 		model_name = remove_prefix(model_name, "Atom(TM) CPU");
+		model_name = remove_prefix(model_name, "Celeron(R) CPU");
 		model_name = remove_prefix(model_name, "Intel(R)");
 
 		remove_suffix(model_name, "CPU @ ");
