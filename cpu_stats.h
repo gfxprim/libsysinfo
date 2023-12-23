@@ -9,6 +9,8 @@
 #ifndef CPU_STATS_H
 #define CPU_STATS_H
 
+struct cpu_arch;
+
 struct cpu_stat {
 	unsigned long long user;
 	unsigned long long user_diff;
@@ -71,7 +73,7 @@ static inline float cpu_stats_load_perc(struct cpu_stats *self, unsigned int cpu
 	return 100.00 * (self->stats[cpu].sum_diff - self->stats[cpu].idle_diff) / self->stats[cpu].sum_diff;
 }
 
-struct cpu_stats *cpu_stats_create(void);
+struct cpu_stats *cpu_stats_create(struct cpu_arch *arch);
 
 void cpu_stats_update(struct cpu_stats *self);
 

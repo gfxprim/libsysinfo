@@ -266,19 +266,24 @@ static enum cpu_uarch parse_hygon_uarch(unsigned int family)
 	return CPU_UARCH_UNKNOWN;
 }
 
-static void parse_uarch(struct cpu_arch *arch, struct cpuinfo_entry *cpu_family, struct cpuinfo_entry *model)
+static void parse_uarch(struct cpu_arch *arch,
+                        struct cpuinfo_entry *cpu_family,
+                        struct cpuinfo_entry *cpu_model)
 {
 	arch->uarch = CPU_UARCH_UNKNOWN;
 
-	if (!cpu_family->found || !model->found)
+	if (!cpu_family->found || !cpu_model->found)
 		return;
+
+	arch->x86.family = cpu_family->val.uint;
+	arch->x86.model = cpu_model->val.uint;
 
 	switch (arch->vendor) {
 	case CPU_VENDOR_INTEL:
-		arch->uarch = parse_intel_uarch(cpu_family->val.uint, model->val.uint);
+		arch->uarch = parse_intel_uarch(cpu_family->val.uint, cpu_model->val.uint);
 	break;
 	case CPU_VENDOR_AMD:
-		arch->uarch = parse_amd_uarch(cpu_family->val.uint, model->val.uint);
+		arch->uarch = parse_amd_uarch(cpu_family->val.uint, cpu_model->val.uint);
 	break;
 	case CPU_VENDOR_HYGON:
 		arch->uarch = parse_hygon_uarch(cpu_family->val.uint);

@@ -12,10 +12,10 @@
 #include "cpu_arch.h"
 #include "cpu_stats.h"
 
+static struct cpu_arch arch;
+
 static void print_cpu_arch(void)
 {
-	struct cpu_arch arch;
-
 	cpu_arch_get(&arch);
 	cpu_arch_print(&arch);
 	printf("\n");
@@ -23,7 +23,7 @@ static void print_cpu_arch(void)
 
 static void show_temp_load(void)
 {
-	struct cpu_stats *stats = cpu_stats_create();
+	struct cpu_stats *stats = cpu_stats_create(&arch);
 
 	printf("CPU temp driver : %s\n\n", stats->temp.driver);
 

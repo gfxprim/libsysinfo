@@ -17,6 +17,7 @@
 #include <fcntl.h>
 
 #include "cpu_stats.h"
+#include "cpu_arch.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
@@ -128,10 +129,6 @@ static void open_cpu_temp(struct cpu_temp *temp,
 	}
 
 	closedir(d);
-
-	temp->fd = -1;
-	temp->temp = INT_MIN;
-	temp->driver = NULL;
 }
 
 static int open_hwmon_temp(const char *subdir_name)
@@ -153,8 +150,20 @@ static int open_hwmon_temp(const char *subdir_name)
 	return -1;
 }
 
-static void open_hwmon(struct cpu_temp *temp)
+static struct cpu_arch *get_arch(struct cpu_arch *arch, struct cpu_arch *tmp)
 {
+	if (arch)
+		return arch;
+
+	cpu_arch_get(tmp);
+
+	return tmp;
+}
+
+static void open_hwmon(struct cpu_temp *temp, struct cpu_arch *arch)
+{
+	struct cpu_arch tmp;
+
 	static const char *hwmon_cpu_drivers[] = {
 		/* AMD */
 		"k10temp",
@@ -165,6 +174,36 @@ static void open_hwmon(struct cpu_temp *temp)
 		"cpu_thermal",
 		NULL
 	};
+
+	temp->fd = -1;
+	temp->temp = INT_MIN;
+	temp->driver = NULL;
+
+	arch = get_arch(arch, &tmp);
+
+	if (arch->vendor == CPU_VENDOR_INTEL) {
+
+		/*
+		 * Avoid coretemp on CPUs that does not support
+		 * MSR_IA32_TEMPERATURE_TARGET.
+		 *
+		 * These are mostly old and Atom CPUs.
+		 *
+		 * Without the correct tjmax offset the reading from coretemp
+		 * have offset possibly by 30 degrees or so.
+		 *
+		 * Let's hope we will fallback to ACPI which tends to work
+		 * better on these machines.
+		 */
+		if (arch->x86.family == 0x06 &&
+		    (arch->x86.model <= 0xe ||
+		     arch->x86.model == 0x1c ||
+		     arch->x86.model == 0x26 ||
+		     arch->x86.model == 0x27 ||
+		     arch->x86.model == 0x35 ||
+		     arch->x86.model == 0x36))
+			return;
+	}
 
 	open_cpu_temp(temp, "/sys/class/hwmon", "/sys/class/hwmon/%s/name",
 	              hwmon_cpu_drivers, open_hwmon_temp);
@@ -271,7 +310,7 @@ static unsigned int count_cpus(void)
 	return cnt;
 }
 
-struct cpu_stats *cpu_stats_create(void)
+struct cpu_stats *cpu_stats_create(struct cpu_arch *arch)
 {
 	struct cpu_stats *stats;
 	unsigned int cpus = count_cpus();
@@ -286,7 +325,7 @@ struct cpu_stats *cpu_stats_create(void)
 
 	load_proc(stats->stats, cpus);
 
-	open_hwmon(&stats->temp);
+	open_hwmon(&stats->temp, arch);
 
 	if (stats->temp.fd < 0)
 		open_acpi_thermal(&stats->temp);

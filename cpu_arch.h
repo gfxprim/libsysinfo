@@ -9,6 +9,7 @@
 #ifndef CPU_ARCH_H
 #define CPU_ARCH_H
 
+#include <stdint.h>
 #include "cpu_vendor.h"
 #include "cpu_uarch.h"
 
@@ -18,6 +19,13 @@ struct cpu_arch {
 
 	int processors;
 	int cores;
+
+	union {
+		struct cpu_arch_x86 {
+			uint8_t family;
+			uint8_t model;
+		} x86;
+	};
 
 	char model_name[128];
 };
