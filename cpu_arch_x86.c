@@ -366,6 +366,13 @@ static void parse_model_name(struct cpu_arch *arch, struct cpuinfo_entry *entry)
 	while (isspace(*model_name))
 		model_name++;
 
+	int len = strlen(model_name)-1;
+
+	while (len > 0 && isspace(model_name[len]))
+		len--;
+
+	model_name[len+1] = 0;
+
 	strncpy(arch->model_name, model_name, sizeof(arch->model_name));
 	arch->model_name[sizeof(arch->model_name)-1] = 0;
 }
