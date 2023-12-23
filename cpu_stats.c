@@ -184,7 +184,14 @@ static int open_acpi_temp(const char *subdir_name)
 static void open_acpi_thermal(struct cpu_temp *temp)
 {
 	static const char *acpi_cpu_types[] = {
+		/* temperature inside of the x86 CPU */
 		"x86_pkg_temp",
+		/*
+		 * temperature close to CPU socket
+		 *
+		 * fall back to this if nothing more specific was found
+		 */
+		"acpitz",
 		NULL
 	};
 
