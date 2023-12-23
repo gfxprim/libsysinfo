@@ -182,6 +182,10 @@ static void open_hwmon(struct cpu_temp *temp, struct cpu_arch *arch)
 	arch = get_arch(arch, &tmp);
 
 	if (arch->vendor == CPU_VENDOR_INTEL) {
+		static const char *hwmon_acpitz_drivers[] = {
+			"acpitz",
+			NULL
+		};
 
 		/*
 		 * Avoid coretemp on CPUs that does not support
@@ -201,8 +205,11 @@ static void open_hwmon(struct cpu_temp *temp, struct cpu_arch *arch)
 		     arch->x86.model == 0x26 ||
 		     arch->x86.model == 0x27 ||
 		     arch->x86.model == 0x35 ||
-		     arch->x86.model == 0x36))
+		     arch->x86.model == 0x36)) {
+			open_cpu_temp(temp, "/sys/class/hwmon", "/sys/class/hwmon/%s/name",
+			              hwmon_acpitz_drivers, open_hwmon_temp);
 			return;
+		}
 	}
 
 	open_cpu_temp(temp, "/sys/class/hwmon", "/sys/class/hwmon/%s/name",
