@@ -331,6 +331,7 @@ static void parse_model_name(struct cpu_arch *arch, struct cpuinfo_entry *entry)
 		model_name = remove_prefix(model_name, "Intel(R)");
 
 		remove_suffix(model_name, "CPU @ ");
+		remove_suffix(model_name, "processor ");
 		remove_suffix(model_name, "@ ");
 	}
 
