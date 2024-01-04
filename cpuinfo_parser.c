@@ -10,6 +10,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
+#include <limits.h>
 #include "cpuinfo_parser.h"
 
 static int parse_string(FILE *f, char *name, size_t namelen, char terminator)
@@ -85,6 +86,7 @@ static struct cpuinfo_entry *entry_by_name(struct cpuinfo_entry *entries,
 static void parse_entry(struct cpuinfo_entry *entry, const char *val)
 {
 	unsigned int ival;
+	long tmp;
 
 	if (!entry)
 		return;
@@ -97,7 +99,16 @@ static void parse_entry(struct cpuinfo_entry *entry, const char *val)
 		entry->val.str = strdup(val);
 	break;
 	case CPUINFO_UINT:
-		entry->val.uint = atoi(val);
+		tmp = strtol(val, NULL, 0);
+
+		if (tmp < 0)
+			return;
+
+		if (sizeof(long) != sizeof(unsigned int) &&
+		    tmp > (long)UINT_MAX)
+			return;
+
+		entry->val.uint = tmp;
 	break;
 	case CPUINFO_UINT_MAX:
 		ival = atoi(val);
@@ -132,7 +143,7 @@ void cpuinfo_parse(struct cpuinfo_entry *entries, size_t entries_cnt)
 			return;
 		}
 
-	//	printf("NAME: '%s'\n", name);
+		//printf("NAME: '%s'\n", name);
 
 		entry = entry_by_name(entries, entries_cnt, name);
 
@@ -141,7 +152,7 @@ void cpuinfo_parse(struct cpuinfo_entry *entries, size_t entries_cnt)
 			return;
 		}
 
-	//	printf("VAL: %s\n", val);
+		//printf("VAL: %s\n", val);
 
 		parse_entry(entry, val);
 	}
