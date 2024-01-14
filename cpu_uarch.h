@@ -50,9 +50,19 @@ enum cpu_uarch {
 	CPU_UARCH_BOBCAT,
 	CPU_UARCH_JAGUAR,
 	CPU_UARCH_PUMA,
-	CPU_UARCH_ARM7,
+	CPU_UARCH_ARM8,
 	CPU_UARCH_ARM9,
+	CPU_UARCH_ARM10,
 	CPU_UARCH_ARM11,
+	CPU_UARCH_SA110,
+	CPU_UARCH_SA1100,
+	CPU_UARCH_IPX425,
+	CPU_UARCH_PXA93X,
+	CPU_UARCH_PXA30X,
+	CPU_UARCH_PXA31X,
+	CPU_UARCH_PXA32X,
+	CPU_UARCH_SA1110,
+	CPU_UARCH_IPX1200,
 	CPU_UARCH_CORTEX_A5,
 	CPU_UARCH_CORTEX_A7,
 	CPU_UARCH_CORTEX_A8,
@@ -111,6 +121,9 @@ enum cpu_uarch {
 	CPU_UARCH_BLIZZARD,
 	CPU_UARCH_THUNDERX,
 	CPU_UARCH_THUNDERX2,
+	CPU_UARCH_OCTEONTX2,
+	CPU_UARCH_THUNDERX3,
+	CPU_UARCH_FEROCEON,
 	CPU_UARCH_PJ4,
 	CPU_UARCH_BRAHMA_B15,
 	CPU_UARCH_BRAHMA_B53,
@@ -213,12 +226,32 @@ static inline const char *cpu_uarch_name(enum cpu_uarch uarch)
 		return "Jaguar";
 	case CPU_UARCH_PUMA:
 		return "Puma";
-	case CPU_UARCH_ARM7:
-		return "Arm7";
+	case CPU_UARCH_ARM8:
+		return "Arm8";
 	case CPU_UARCH_ARM9:
 		return "Arm9";
+	case CPU_UARCH_ARM10:
+		return "Arm10";
 	case CPU_UARCH_ARM11:
 		return "Arm11";
+	case CPU_UARCH_SA110:
+		return "SA110";
+	case CPU_UARCH_SA1100:
+		return "SA1100";
+	case CPU_UARCH_IPX425:
+		return "IPX425";
+	case CPU_UARCH_PXA93X:
+		return "PXA93x";
+	case CPU_UARCH_PXA30X:
+		return "PXA30x";
+	case CPU_UARCH_PXA31X:
+		return "PXA31x";
+	case CPU_UARCH_PXA32X:
+		return "PXA32x";
+	case CPU_UARCH_SA1110:
+		return "SA1110";
+	case CPU_UARCH_IPX1200:
+		return "IPX1200";
 	case CPU_UARCH_CORTEX_A5:
 		return "Cortex A5";
 	case CPU_UARCH_CORTEX_A7:
@@ -332,11 +365,17 @@ static inline const char *cpu_uarch_name(enum cpu_uarch uarch)
 	case CPU_UARCH_BLIZZARD:
 		return "Blizzard";
 	case CPU_UARCH_THUNDERX:
-		return "Thunderx";
+		return "ThunderX";
 	case CPU_UARCH_THUNDERX2:
-		return "Thunderx2";
+		return "ThunderX2";
+	case CPU_UARCH_OCTEONTX2:
+		return "OcteonTX2";
+	case CPU_UARCH_THUNDERX3:
+		return "ThunderX3";
+	case CPU_UARCH_FEROCEON:
+		return "Feroceon";
 	case CPU_UARCH_PJ4:
-		return "Pj4";
+		return "PJ4";
 	case CPU_UARCH_BRAHMA_B15:
 		return "Brahma B15";
 	case CPU_UARCH_BRAHMA_B53:
