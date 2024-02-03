@@ -33,6 +33,10 @@ enum cpu_vendor {
 	CPU_VENDOR_DEC,
 	CPU_VENDOR_ZHAOXIN,
 	CPU_VENDOR_VORTEX,
+	CPU_VENDOR_HISILICON,
+	CPU_VENDOR_FUJITSU,
+	CPU_VENDOR_FARADAY,
+	CPU_VENDOR_AMPERE,
 };
 
 static inline const char *cpu_vendor_name(enum cpu_vendor vendor)
@@ -96,6 +100,14 @@ static inline const char *cpu_vendor_name(enum cpu_vendor vendor)
 		return "Zhaoxin";
 	case CPU_VENDOR_VORTEX:
 		return "Vortex";
+	case CPU_VENDOR_HISILICON:
+		return "HiSilicon";
+	case CPU_VENDOR_FUJITSU:
+		return "Fujitsu";
+	case CPU_VENDOR_FARADAY:
+		return "Faraday";
+	case CPU_VENDOR_AMPERE:
+		return "Ampere";
 	}
 
 	return "Fixme";

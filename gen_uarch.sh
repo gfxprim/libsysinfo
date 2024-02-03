@@ -11,7 +11,7 @@ echo
 
 echo "enum cpu_uarch {"
 for i in $(cat cpu_uarchs.txt); do
-	cap=$(echo "cpu_uarch_$i" | tr [a-z] [A-Z])
+	cap=$(echo "cpu_uarch_$i" | tr [a-z] [A-Z] | tr  - _)
 	echo "	$cap,"
 done
 echo "};"
@@ -21,7 +21,7 @@ echo "{"
 echo "	switch (uarch) {"
 for i in $(cat cpu_uarchs.txt); do
 	name=$(echo $i |sed "s/_/ /" | sed -e "s/\b\(.\)/\u\1/g")
-	cap=$(echo "cpu_uarch_$i" | tr [a-z] [A-Z])
+	cap=$(echo "cpu_uarch_$i" | tr [a-z] [A-Z] | tr  - _)
 	echo "	case $cap:"
 	echo "		return \"$name\";"
 done

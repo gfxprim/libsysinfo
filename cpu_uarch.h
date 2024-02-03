@@ -119,6 +119,8 @@ enum cpu_uarch {
 	CPU_UARCH_ICESTORM,
 	CPU_UARCH_AVALANCHE,
 	CPU_UARCH_BLIZZARD,
+	CPU_UARCH_SAWTOOTH,
+	CPU_UARCH_EVEREST,
 	CPU_UARCH_THUNDERX,
 	CPU_UARCH_THUNDERX2,
 	CPU_UARCH_OCTEONTX2,
@@ -129,6 +131,12 @@ enum cpu_uarch {
 	CPU_UARCH_BRAHMA_B53,
 	CPU_UARCH_XGENE,
 	CPU_UARCH_TAISHAN_V110,
+	CPU_UARCH_TAISHAN_V120,
+	CPU_UARCH_A64FX,
+	CPU_UARCH_FA526,
+	CPU_UARCH_FA626,
+	CPU_UARCH_AMPERE_1,
+	CPU_UARCH_AMPERE_1A,
 };
 
 static inline const char *cpu_uarch_name(enum cpu_uarch uarch)
@@ -364,6 +372,10 @@ static inline const char *cpu_uarch_name(enum cpu_uarch uarch)
 		return "Avalanche";
 	case CPU_UARCH_BLIZZARD:
 		return "Blizzard";
+	case CPU_UARCH_SAWTOOTH:
+		return "Sawtooth";
+	case CPU_UARCH_EVEREST:
+		return "Everest";
 	case CPU_UARCH_THUNDERX:
 		return "ThunderX";
 	case CPU_UARCH_THUNDERX2:
@@ -383,7 +395,19 @@ static inline const char *cpu_uarch_name(enum cpu_uarch uarch)
 	case CPU_UARCH_XGENE:
 		return "Xgene";
 	case CPU_UARCH_TAISHAN_V110:
-		return "Taishan V110";
+		return "TaiShan V110";
+	case CPU_UARCH_TAISHAN_V120:
+		return "TaiShan V120";
+	case CPU_UARCH_A64FX:
+		return "A64FX";
+	case CPU_UARCH_FA526:
+		return "FA526";
+	case CPU_UARCH_FA626:
+		return "FA626";
+	case CPU_UARCH_AMPERE_1:
+		return "Ampere-1";
+	case CPU_UARCH_AMPERE_1A:
+		return "Ampere-1A";
 	}
 
 	return "Fixme";

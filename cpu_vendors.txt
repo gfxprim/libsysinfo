@@ -27,3 +27,7 @@ UMC
 DEC
 Zhaoxin
 Vortex
+HiSilicon
+Fujitsu
+Faraday
+Ampere

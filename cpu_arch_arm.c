@@ -228,6 +228,117 @@ static enum cpu_uarch match_uarch_intel(unsigned int cpu_part)
 	}
 }
 
+static enum cpu_uarch match_uarch_hisilicon(unsigned int cpu_part)
+{
+	switch (cpu_part) {
+	case 0xd01:
+		return CPU_UARCH_TAISHAN_V110;
+	case 0xd02:
+		return CPU_UARCH_TAISHAN_V120;
+	case 0xd40:
+		return CPU_UARCH_CORTEX_A76;
+	case 0xd41:
+		return CPU_UARCH_CORTEX_A77;
+	default:
+		return CPU_UARCH_UNKNOWN;
+	}
+}
+
+static enum cpu_uarch match_uarch_fujitsu(unsigned int cpu_part)
+{
+	switch (cpu_part) {
+	case 0x01:
+		return CPU_UARCH_A64FX;
+	default:
+		return CPU_UARCH_UNKNOWN;
+	}
+}
+
+static enum cpu_uarch match_uarch_faraday(unsigned int cpu_part)
+{
+	switch (cpu_part) {
+	case 0x526:
+		return CPU_UARCH_FA526;
+	case 0x626:
+		return CPU_UARCH_FA626;
+	default:
+		return CPU_UARCH_UNKNOWN;
+	}
+}
+
+static enum cpu_uarch match_uarch_ampere(unsigned int cpu_part)
+{
+	switch (cpu_part) {
+	case 0xac3:
+		return CPU_UARCH_AMPERE_1;
+	case 0xac4:
+		return CPU_UARCH_AMPERE_1A;
+	default:
+		return CPU_UARCH_UNKNOWN;
+	}
+}
+
+static enum cpu_uarch match_uarch_apple(unsigned int cpu_part)
+{
+	switch (cpu_part) {
+	case 0x000:
+		return CPU_UARCH_SWIFT;
+	case 0x001:
+		return CPU_UARCH_CYCLONE;
+	case 0x002:
+	case 0x003:
+		return CPU_UARCH_TYPHOON;
+	case 0x004:
+	case 0x005:
+		return CPU_UARCH_TWISTER;
+	case 0x006:
+	case 0x007:
+		return CPU_UARCH_HURRICANE;
+	case 0x008:
+		return CPU_UARCH_MONSOON;
+	case 0x009:
+		return CPU_UARCH_MISTRAL;
+	case 0x00b:
+	case 0x010:
+		return CPU_UARCH_VORTEX;
+	case 0x00c:
+	case 0x00f:
+	case 0x011:
+		return CPU_UARCH_TEMPEST;
+	case 0x012:
+		return CPU_UARCH_LIGHTNING;
+	case 0x013:
+	case 0x026:
+		return CPU_UARCH_THUNDER;
+	case 0x020:
+	case 0x022:
+	case 0x024:
+	case 0x028:
+		return CPU_UARCH_ICESTORM;
+	case 0x021:
+	case 0x023:
+	case 0x025:
+	case 0x029:
+		return CPU_UARCH_FIRESTORM;
+	case 0x030:
+	case 0x032:
+	case 0x034:
+	case 0x038:
+		return CPU_UARCH_BLIZZARD;
+	case 0x031:
+	case 0x033:
+	case 0x035:
+	case 0x039:
+		return CPU_UARCH_AVALANCHE;
+	case 0x036:
+		return CPU_UARCH_SAWTOOTH;
+	case 0x037:
+		return CPU_UARCH_EVEREST;
+	default:
+		return CPU_UARCH_UNKNOWN;
+	}
+}
+
 static struct vendor_id_map {
 	unsigned int implementer_id;
 	enum cpu_vendor vendor_id;
@@ -237,12 +348,17 @@ static struct vendor_id_map {
 	{0x42, CPU_VENDOR_BROADCOM, match_uarch_broadcom},
 	{0x43, CPU_VENDOR_CAVIUM, match_uarch_cavium},
 	{0x44, CPU_VENDOR_DEC, match_uarch_dec},
+	{0x46, CPU_VENDOR_FUJITSU, match_uarch_fujitsu},
 	{0x4e, CPU_VENDOR_NVIDIA, match_uarch_nvidia},
+	{0x48, CPU_VENDOR_HISILICON, match_uarch_hisilicon},
 	{0x50, CPU_VENDOR_APM, match_uarch_apm},
 	{0x51, CPU_VENDOR_QUALCOMM, match_uarch_qualcomm},
 	{0x53, CPU_VENDOR_SAMSUNG, match_uarch_samsung},
 	{0x56, CPU_VENDOR_MARVELL, match_uarch_marvel},
+	{0x61, CPU_VENDOR_APPLE, match_uarch_apple},
+	{0x66, CPU_VENDOR_FARADAY, match_uarch_faraday},
 	{0x69, CPU_VENDOR_INTEL, match_uarch_intel},
+	{0xc0, CPU_VENDOR_AMPERE, match_uarch_ampere},
 };
 
 static void match_vendor_uarch(struct cpu_arch *arch, struct cpuinfo_entry *implementer, struct cpuinfo_entry *cpu_part)
