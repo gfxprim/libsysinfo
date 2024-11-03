@@ -7,3 +7,5 @@
 cpu_info_test
 bat_info_test
 mem_info_test
+read_proc_test
+guid_map_cache_test
