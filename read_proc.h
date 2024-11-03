@@ -99,7 +99,7 @@ struct read_proc_buf {
 	size_t len;
 };
 
-static inline uint64_t read_proc_buf_get_num(struct read_proc_buf *buf)
+static inline uint64_t read_proc_buf_get_unum(struct read_proc_buf *buf)
 {
 	uint64_t ret = 0;
 
@@ -123,6 +123,24 @@ static inline uint64_t read_proc_buf_get_num(struct read_proc_buf *buf)
 		if (!buf->len)
 			return ret;
 	}
+}
+
+static inline int64_t read_proc_buf_get_snum(struct read_proc_buf *buf)
+{
+	int neg = 1;
+
+	if (!buf->len)
+		return 0;
+
+	if (*(buf->buf) == '-') {
+		neg = -1;
+		buf->len--;
+		buf->buf++;
+	}
+
+	int64_t ret = read_proc_buf_get_unum(buf);
+
+	return neg * ret;
 }
 
 static inline char read_proc_buf_getc(struct read_proc_buf *buf)
@@ -274,6 +292,24 @@ struct read_proc_stat {
 	uint64_t stime;
 
 	/**
+	 * @brief Process schedulling priority.
+	 */
+	int nice;
+
+	/**
+	 * @brief Process start time.
+	 *
+	 * The value is in system ticks since the machine boot use
+	 * sysconf(_SC_CLK_TCK) to get number of ticks per second.
+	 */
+	uint64_t start_time;
+
+	/**
+	 * @brief Program memory resident set in pages.
+	 */
+	uint32_t rss;
+
+	/**
 	 * @brief The command name.
 	 *
 	 * The string from /proc/$pid/comm
@@ -311,7 +347,7 @@ static inline int read_proc_stat(struct read_proc *p, struct read_proc_stat *sta
 	buf.buf = str;
 
 	/* PID */
-	stat->pid = read_proc_buf_get_num(&buf);
+	stat->pid = read_proc_buf_get_snum(&buf);
 
 	/* Remove ' (' */
 	read_proc_buf_getc(&buf);
@@ -331,23 +367,51 @@ static inline int read_proc_stat(struct read_proc *p, struct read_proc_stat *sta
 	read_proc_buf_getc(&buf);
 
 	/* Read parent PID and remove ' ' */
-	stat->ppid = read_proc_buf_get_num(&buf);
+	stat->ppid = read_proc_buf_get_snum(&buf);
 	read_proc_buf_getc(&buf);
 
 	/* Read process group and remove ' ' */
-	stat->pgrp = read_proc_buf_get_num(&buf);
+	stat->pgrp = read_proc_buf_get_snum(&buf);
 	read_proc_buf_getc(&buf);
 
 	/* Ignore 8 numeric fields */
 	for (i = 0; i < 8; i++) {
-		read_proc_buf_get_num(&buf);
+		read_proc_buf_get_snum(&buf);
 		read_proc_buf_getc(&buf);
 	}
 
 	/* Read User and System time */
-	stat->utime = read_proc_buf_get_num(&buf);
+	stat->utime = read_proc_buf_get_unum(&buf);
 	read_proc_buf_getc(&buf);
-	stat->stime = read_proc_buf_get_num(&buf);
+	stat->stime = read_proc_buf_get_unum(&buf);
+	read_proc_buf_getc(&buf);
+
+	/* Ignore cstime, cutime and realtime prio */
+	for (i = 0; i < 3; i++) {
+		read_proc_buf_get_snum(&buf);
+		read_proc_buf_getc(&buf);
+	}
+
+	/* Read nice value. */
+	stat->nice = read_proc_buf_get_snum(&buf);
+	read_proc_buf_getc(&buf);
+
+	/* Ignore num threads and itrealvalue */
+	for (i = 0; i < 2; i++) {
+		read_proc_buf_get_snum(&buf);
+		read_proc_buf_getc(&buf);
+	}
+
+	/* Read process start time. */
+	stat->start_time = read_proc_buf_get_unum(&buf);
+	read_proc_buf_getc(&buf);
+
+	/* Ignore vmsize. */
+	read_proc_buf_get_unum(&buf);
+	read_proc_buf_getc(&buf);
+
+	/* Read program resident set. */
+	stat->rss = read_proc_buf_get_unum(&buf);
 	read_proc_buf_getc(&buf);
 
 	close(fd);
@@ -374,9 +438,9 @@ static inline int read_proc_stat(struct read_proc *p, struct read_proc_stat *sta
 			/* Get rid of ':' */
 			read_proc_buf_getc(&buf);
 			read_proc_buf_eat_ws(&buf);
-			stat->uid = read_proc_buf_get_num(&buf);
+			stat->uid = read_proc_buf_get_unum(&buf);
 			read_proc_buf_eat_ws(&buf);
-			stat->euid = read_proc_buf_get_num(&buf);
+			stat->euid = read_proc_buf_get_unum(&buf);
 		}
 
 		if (id_str[0] == 'G' && id_str[1] == 'i' &&
@@ -384,9 +448,9 @@ static inline int read_proc_stat(struct read_proc *p, struct read_proc_stat *sta
 			/* Get rid of ':' */
 			read_proc_buf_getc(&buf);
 			read_proc_buf_eat_ws(&buf);
-			stat->gid = read_proc_buf_get_num(&buf);
+			stat->gid = read_proc_buf_get_unum(&buf);
 			read_proc_buf_eat_ws(&buf);
-			stat->egid = read_proc_buf_get_num(&buf);
+			stat->egid = read_proc_buf_get_unum(&buf);
 		}
 
 		read_proc_buf_next_line(&buf);

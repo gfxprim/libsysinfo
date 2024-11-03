@@ -23,9 +23,10 @@ int main(void)
 	while (read_proc_next(&p)) {
 		read_proc_stat(&p, &stat);
 
-		printf("%8i %c [ %-31s ] UID: %6i EUID: %6i GID: %6i EGID: %6i\n",
+		printf("%8i %c [ %-31s ] UID: %6i EUID: %6i GID: %6i EGID: %6i RSS: %10u\n",
 		       stat.pid, stat.state, stat.comm,
-		       stat.uid, stat.euid, stat.gid, stat.egid);
+		       stat.uid, stat.euid, stat.gid, stat.egid,
+		       stat.rss);
 	}
 
 	read_proc_exit(&p);
