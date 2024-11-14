@@ -95,16 +95,20 @@ static inline int read_proc_next(struct read_proc *p)
 }
 
 struct read_proc_buf {
+	ssize_t len;
+	int fail;
 	char *buf;
-	size_t len;
 };
 
 static inline uint64_t read_proc_buf_get_unum(struct read_proc_buf *buf)
 {
 	uint64_t ret = 0;
+	int parsed_something = 0;
 
-	if (!buf->len)
+	if (!buf->len) {
+		buf->fail = 1;
 		return ret;
+	}
 
 	for (;;) {
 		char c  = *(buf->buf);
@@ -112,8 +116,11 @@ static inline uint64_t read_proc_buf_get_unum(struct read_proc_buf *buf)
 		switch (c) {
 		case '0' ... '9':
 			ret = 10 * ret + c - '0';
+			parsed_something = 1;
 		break;
 		default:
+			if (!parsed_something)
+				buf->fail = 1;
 			return ret;
 		}
 
@@ -129,8 +136,10 @@ static inline int64_t read_proc_buf_get_snum(struct read_proc_buf *buf)
 {
 	int neg = 1;
 
-	if (!buf->len)
+	if (!buf->len) {
+		buf->fail = 1;
 		return 0;
+	}
 
 	if (*(buf->buf) == '-') {
 		neg = -1;
@@ -145,8 +154,10 @@ static inline int64_t read_proc_buf_get_snum(struct read_proc_buf *buf)
 
 static inline char read_proc_buf_getc(struct read_proc_buf *buf)
 {
-	if (!buf->len)
+	if (!buf->len) {
+		buf->fail = 1;
 		return 0;
+	}
 
 	char ret = *(buf->buf);
 
@@ -161,8 +172,10 @@ static inline void read_proc_buf_get_str(struct read_proc_buf *buf,
 					 char delim)
 {
 	for (;;) {
-		if (!buf->len)
+		if (!buf->len) {
+			buf->fail = 1;
 			goto ret;
+		}
 
 		char c = *(buf->buf);
 
@@ -186,17 +199,24 @@ ret:
 
 static inline void read_proc_buf_eat_ws(struct read_proc_buf *buf)
 {
+	int parsed_something = 0;
+
 	for (;;) {
-		if (!buf->len)
+		if (!buf->len) {
+			buf->fail = 1;
 			return;
+		}
 
 		char c = *(buf->buf);
 
 		switch (c) {
 		case ' ':
 		case '\t':
+			parsed_something = 1;
 		break;
 		default:
+			if (!parsed_something)
+				buf->fail = 1;
 			return;
 		}
 
@@ -208,8 +228,10 @@ static inline void read_proc_buf_eat_ws(struct read_proc_buf *buf)
 static inline void read_proc_buf_next_line(struct read_proc_buf *buf)
 {
 	for (;;) {
-		if (!buf->len)
+		if (!buf->len) {
+			buf->fail = 1;
 			return;
+		}
 
 		char c = *(buf->buf);
 
@@ -334,7 +356,7 @@ struct read_proc_stat {
 static inline int read_proc_stat(struct read_proc *p, struct read_proc_stat *stat)
 {
 	char str[2048];
-	struct read_proc_buf buf, comm;
+	struct read_proc_buf buf = {}, comm = {};
 	int fd;
 	unsigned int i;
 
@@ -345,6 +367,10 @@ static inline int read_proc_stat(struct read_proc *p, struct read_proc_stat *sta
 
 	buf.len = read(fd, str, sizeof(str));
 	buf.buf = str;
+	if (buf.len < 0) {
+		close(fd);
+		return 1;
+	}
 
 	/* PID */
 	stat->pid = read_proc_buf_get_snum(&buf);
@@ -416,6 +442,9 @@ static inline int read_proc_stat(struct read_proc *p, struct read_proc_stat *sta
 
 	close(fd);
 
+	if (buf.fail)
+		return 1;
+
 	snprintf(str, sizeof(str), "/proc/%i/status", p->pid);
 	fd = open(str, O_RDONLY);
 	if (!fd)
@@ -423,12 +452,16 @@ static inline int read_proc_stat(struct read_proc *p, struct read_proc_stat *sta
 
 	buf.len = read(fd, str, sizeof(str));
 	buf.buf = str;
+	if (buf.len < 0) {
+		close(fd);
+		return 1;
+	}
 
 	while (buf.len) {
 		char id_str[32];
 		struct read_proc_buf id = {
 			.buf = id_str,
-			.len = sizeof(id_str)\
+			.len = sizeof(id_str)
 		};
 
 		read_proc_buf_get_str(&buf, &id, ':');
@@ -457,6 +490,9 @@ static inline int read_proc_stat(struct read_proc *p, struct read_proc_stat *sta
 	}
 
 	close(fd);
+
+	if (buf.fail)
+		return 1;
 
 	return 0;
 }

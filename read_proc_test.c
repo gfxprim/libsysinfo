@@ -21,7 +21,10 @@ int main(void)
 	}
 
 	while (read_proc_next(&p)) {
-		read_proc_stat(&p, &stat);
+		if (read_proc_stat(&p, &stat)) {
+			printf("Failed to parse %i\n", p.pid);
+			continue;
+		}
 
 		printf("%8i %c [ %-31s ] UID: %6i EUID: %6i GID: %6i EGID: %6i RSS: %10u\n",
 		       stat.pid, stat.state, stat.comm,
